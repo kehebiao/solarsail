@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Kepler Model of the Solar System</title>
+  </head>
+
+  <body>
+    <canvas id="canvas" width="640" height="480">
+    </canvas>
+
+    <table id="bodies">
+      <tr>
+        <th>Body</th>
+        <th>Periapsis</th>
+        <th>Apoapsis</th>
+        <th><i>i</i></th>
+        <th>&Omega;</th>
+        <th>&omega;</th>
+        <th>Period</th>
+      </tr>
+
+      <tr>
+        <td>Sol</td>
+      </tr>
+
+      <tr>
+        <td>Mercury</td>
+        <td>0.307499 AU</td>
+        <td>0.466697 AU</td>
+        <td>7.005&deg;</td>
+        <td>48.331&deg;</td>
+        <td>29.124&deg;</td>
+        <td>87.969 d</td>
+      </tr>
+
+      <tr>
+        <td>Venus</td>
+        <td>0.728213 AU</td>
+        <td>0.718440 AU</td>
+        <td>3.39458&deg;</td>
+        <td>76.678&deg;</td>
+        <td>55.186&deg;</td>
+        <td>224.698 d</td>
+      </tr>
+
+      <tr>
+        <td>Earth</td>
+        <td>0.98329134 AU</td>
+        <td>1.01671388 AU</td>
+        <td>0&deg;</td>
+        <td>348.73936&deg;</td>
+        <td>114.20783&deg;</td>
+        <td>365.256363004</td>
+      </tr>
+
+      <tr>
+        <td>Mars</td>
+        <td>1.381497 AU</td>
+        <td>1.665861 AU</td>
+        <td>1.85&deg;</td>
+        <td>49.562&deg;</td>
+        <td>286.537&deg;</td>
+        <td>686.971 d</td>
+      </tr>
+
+      <tr>
+        <td>Ceres</td>
+        <td>2.5468 AU</td>
+        <td>2.9858 AU</td>
+        <td>10.587&deg;</td>
+        <td>80.3932&deg;</td>
+        <td>72.5898&deg;</td>
+        <td>1679.67 d</td>
+      </tr>
+
+      <tr>
+        <td>Jupiter</td>
+        <td>4.950429 AU</td>
+        <td>5.458104 AU</td>
+        <td>1.305&deg;</td>
+        <td>100.492&deg;</td>
+        <td>275.066&deg;</td>
+        <td>4332.59 d</td>
+      </tr>
+
+      <tr>
+        <td>Saturn</td>
+        <td>9.04807635 AU</td>
+        <td>10.11595804 AU</td>
+        <td>2.48524&deg;</td>
+        <td>113.642811&deg;</td>
+        <td>336.013862&deg;</td>
+        <td>10759.22 d</td>
+      </tr>
+
+      <tr>
+        <td>Uranus</td>
+        <td>18.37551863 AU</td>
+        <td>20.08330526 AU</td>
+        <td>0.772556&deg;</td>
+        <td>73.989821&deg;</td>
+        <td>96.541318&deg;</td>
+        <td>30799.095 d</td>
+      </tr>
+
+      <tr>
+        <td>Neptune</td>
+        <td>29.76607095 AU</td>
+        <td>30.44125206 AU</td>
+        <td>1.767975&deg;</td>
+        <td>131.794310&deg;</td>
+        <td>265.646853&deg;</td>
+        <td>60190.03 d</td>
+      </tr>
+
+      <tr>
+        <td>Pluto</td>
+        <td>29.657 AU</td>
+        <td>48.871 AU</td>
+        <td>17.151394&deg;</td>
+        <td>110.28683&deg;</td>
+        <td>113.76349&deg;</td>
+        <td>89865.65 d</td>
+      </tr>
+
+      <tr>
+        <td>Haumea</td>
+        <td>34.721 AU</td>
+        <td>51.544 AU</td>
+        <td>28.22&deg;</td>
+        <td>121.10&deg;</td>
+        <td>239.18&deg;</td>
+        <td>103468 d</td>
+      </tr>
+
+      <tr>
+        <td>Makemake</td>
+        <td>38.509 AU</td>
+        <td>53.074 AU</td>
+        <td>28.96&deg;</td>
+        <td>79.382&deg;</td>
+        <td>298.41&deg;</td>
+        <td>113183 d</td>
+      </tr>
+
+      <tr>
+        <td>Eris</td>
+        <td>38.375 AU</td>
+        <td>97.65 AU</td>
+        <td>43.844&deg;</td>
+        <td>36.051&deg;</td>
+        <td>150.809&deg;</td>
+        <td>204870 d</td>
+      </tr>
+    </table>
+
+    <script type="text/javascript">
+      "use strict"
+
+      var canvas = document.getElementById("canvas"),
+          table  = document.getElementById("bodies"),
+          ctx    = canvas.getContext("2d")
+
+      ctx.save()
+      ctx.translate(canvas.width * 0.35, canvas.height * 0.5)
+
+      var rows = table.getElementsByTagName("tr"),
+          i, cols, per, apo, inc, lon, arg, min
+
+      for(i = 0; i !== rows.length; ++i) {
+        cols = rows[i].getElementsByTagName("td")
+
+        if(cols.length === 1) {
+          ctx.beginPath()
+          ctx.arc(0, 0, 1, 0, 2 * Math.PI, true)
+          ctx.fill()
+        }
+
+        else if(cols.length === 7) {
+          per = parseFloat(cols[1].textContent)
+          apo = parseFloat(cols[2].textContent)
+          inc = parseFloat(cols[3].textContent)
+          lon = parseFloat(cols[4].textContent)
+          arg = parseFloat(cols[5].textContent)
+          min = Math.sqrt(per * apo)
+
+          ctx.save()
+          ctx.rotate(-(lon * Math.PI / 180))
+          ctx.scale(1, Math.cos(inc * Math.PI / 180))
+          ctx.rotate(-(arg * Math.PI / 180))
+          ctx.scale(1, Math.sqrt(per * apo) * 2 / (per + apo))
+          ctx.beginPath()
+          ctx.arc((per - apo) * 0.5 * 5, 0, (per + apo) * 0.5 * 5, 0, 2 * Math.PI, true)
+          ctx.stroke()
+          ctx.restore()
+        }
+      }
+
+      ctx.restore()
+    </script>
+  </body>
+</html>
