@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  </head>
+
+  <body>
+    <canvas id="canvas" width="512" height="512">
+    </canvas>
+
+    <script type="text/javascript">
+      "use strict"
+
+      /* FIXME: This little physics simulation is neat and all, but it falls
+       * apart quite quickly due to rounding errors, especially with moons that
+       * orbit close to their planets (like Earth's). I suspect it would be
+       * better to treat the planets and moons as "fixed", following equations
+       * for each orbit and so on, and only doing a full physics simulation for
+       * bodies that can change accelleration, like spaceships and such.
+       * 
+       * The upshot of doing it that way is that we can reasonably support many
+       * more moons and asteroids at a lower cost of processing power. */
+
+      function Particle(name, mass, x, y, vx, vy) {
+        this.name = name
+        this.mass = mass
+        this.x    = x
+        this.y    = y
+        this.vx   = vx
+        this.vy   = vy
+        this.ax   = undefined
+        this.ay   = undefined
+      }
+
+      /* Gravitational constant in AU^3 * kg^-1 * d^-2. */
+      Particle.G = 1.4880826031659495e-34
+
+      /* Advance the simulation in increments of, at most, six hours. */
+      Particle.STEP = 0.25
+
+      Particle.step = function(particles, dt) {
+        var i = particles.length,
+            j
+
+        if(i--)
+          particles[i].reset()
+
+        while(i--) {
+          particles[i].reset()
+
+          j = particles.length
+          while(--j !== i)
+            particles[i].gravitate(particles[j])
+        }
+
+        i = particles.length
+        while(i--)
+          particles[i].resolve(dt)
+      }
+
+      Particle.advance = function(particles, dt) {
+        while(dt > Particle.STEP) {
+          Particle.step(particles, Particle.STEP)
+          dt -= Particle.STEP
+        }
+
+        if(dt > 0)
+          Particle.step(particles, dt)
+      }
+
+      Particle.prototype.reset = function() {
+        this.ax = 0
+        this.ay = 0
+      }
+
+      Particle.prototype.gravitate = function(that) {
+        var dx = that.x - this.x,
+            dy = that.y - this.y,
+            f  = Particle.G * this.mass * that.mass * Math.pow(dx * dx + dy * dy, -1.5)
+
+        dx *= f
+        dy *= f
+
+        this.ax += dx
+        this.ay += dy
+        that.ax -= dx
+        that.ay -= dy
+      }
+
+      Particle.prototype.resolve = function(dt) {
+        this.x += this.vx * dt
+        this.y += this.vy * dt
+
+        dt /= this.mass
+        this.vx += this.ax * dt
+        this.vy += this.ay * dt
+      }
+
+      Particle.prototype.draw = function(ctx) {
+        ctx.beginPath()
+        ctx.arc(this.x * 8, this.y * 8, 4, 0, 2 * Math.PI, true)
+        ctx.fill()
+      }
+
+      var canvas    = document.getElementById("canvas"),
+          ctx       = canvas.getContext("2d"),
+          particles = [
+            new Particle(     "Sol", 1.98910e30,  0.004306786120421,  0.001837532941042, -0.000001819959993274,  0.000005304892982043),
+            new Particle( "Jupiter", 1.89813e27, -5.006795463945934, -2.138374293923735,  0.002875826974943716, -0.006589043610447228),
+            new Particle(  "Saturn", 5.68319e26,  7.242418416671252,  5.690983162419947, -0.003748446009407056,  0.004375007882123564),
+            new Particle( "Neptune", 1.02410e26, -15.55789222286065, -26.00846751987677,  0.002674516667751287, -0.001593015512290728),
+            new Particle(  "Uranus", 8.68103e25, -18.20862254124535, -1.932683895494710,  0.000385947272031681, -0.004094768048725593),
+            new Particle(   "Earth", 5.97360e24, -0.176226727277768,  0.968433523644931, -0.017195689010009980, -0.003210508555562230),
+            new Particle(   "Venus", 4.86850e24, -0.031638330456358, -0.724079486788030,  0.020063065336796250, -0.001072254178781860),
+            new Particle(    "Mars", 6.41850e23,  1.330411586046046,  0.498029360999410, -0.004366714270865902,  0.014306132221850870),
+            new Particle( "Mercury", 3.30200e23,  0.260803101047849,  0.194154800478263, -0.022403571604671300,  0.023738528365880610),
+            new Particle("Ganymede", 1.48200e23, -5.000295105426739, -2.135367979453066,  0.000238327057719573, -0.000895806114936340),
+            new Particle(   "Titan", 1.34553e23,  7.244673448043061,  5.697951698056964, -0.006773622791592816,  0.005340189721916555),
+            new Particle("Callisto", 1.07600e23, -5.014316678803866, -2.148471570524802,  0.006692662546385938, -0.009386503022623945),
+            new Particle(      "Io", 8.93300e22, -5.008512193291936, -2.136135355673366, -0.005037531455149770, -0.012699969346790770),
+            new Particle(    "Luna", 7.34900e22, -0.178796102519131,  0.967928918272427, -0.017048442635268410, -0.003765966782711167),
+            new Particle(  "Europa", 4.79700e22, -5.002337525287256, -2.138505372896449,  0.003046656282427492,  0.001387856378147721),
+            new Particle(  "Triton", 2.14700e22, -15.55623909521265, -26.00918305605782,  0.001085754102362194, -0.003360665650946588),
+            new Particle(    "Eris", 1.67000e22,  88.85317615801596,  19.63231277532461,  0.000113347345216870,  0.001056834242451327),
+            new Particle(   "Pluto", 1.31400e22, -30.41814872632992,  2.124378897522244,  0.000365253253353883, -0.003322858459787869)
+          ],
+          t1 = Date.now()
+
+      setInterval(function() {
+        var t2 = Date.now()
+        Particle.advance(particles, (t2 - t1) * 0.001 * 365.25)
+        t1 = t2
+      }, 1)
+
+      setInterval(function() {
+        var i
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        ctx.save()
+        ctx.translate(canvas.width * 0.5, canvas.height * 0.5)
+
+        i = particles.length
+        while(i--)
+          particles[i].draw(ctx)
+
+        ctx.restore()
+      }, 1000 / 60)
+    </script>
+  </body>
+</html>
