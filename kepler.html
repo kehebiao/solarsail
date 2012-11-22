@@ -162,35 +162,36 @@
           ctx    = canvas.getContext("2d")
 
       ctx.save()
-      ctx.translate(canvas.width * 0.35, canvas.height * 0.5)
+      ctx.translate(canvas.width / 3, canvas.height / 2)
+      ctx.scale(5, 5)
+      ctx.lineWidth = 1 / 5
 
       var rows = table.getElementsByTagName("tr"),
-          i, cols, per, apo, inc, lon, arg, min
+          i, cols, per, apo, inc, lon, arg
 
       for(i = 0; i !== rows.length; ++i) {
         cols = rows[i].getElementsByTagName("td")
 
         if(cols.length === 1) {
           ctx.beginPath()
-          ctx.arc(0, 0, 1, 0, 2 * Math.PI, true)
+          ctx.arc(0, 0, 0.0625, 0, 2 * Math.PI, true)
           ctx.fill()
         }
 
         else if(cols.length === 7) {
           per = parseFloat(cols[1].textContent)
           apo = parseFloat(cols[2].textContent)
-          inc = parseFloat(cols[3].textContent)
-          lon = parseFloat(cols[4].textContent)
-          arg = parseFloat(cols[5].textContent)
-          min = Math.sqrt(per * apo)
+          inc = parseFloat(cols[3].textContent) * Math.PI / -180
+          lon = parseFloat(cols[4].textContent) * Math.PI / -180
+          arg = parseFloat(cols[5].textContent) * Math.PI / -180
 
           ctx.save()
-          ctx.rotate(-(lon * Math.PI / 180))
-          ctx.scale(1, Math.cos(inc * Math.PI / 180))
-          ctx.rotate(-(arg * Math.PI / 180))
+          ctx.rotate(lon)
+          ctx.scale(1, Math.cos(inc))
+          ctx.rotate(arg)
           ctx.scale(1, Math.sqrt(per * apo) * 2 / (per + apo))
           ctx.beginPath()
-          ctx.arc((per - apo) * 0.5 * 5, 0, (per + apo) * 0.5 * 5, 0, 2 * Math.PI, true)
+          ctx.arc((per - apo) * 0.5, 0, (per + apo) * 0.5, 0, 2 * Math.PI, true)
           ctx.stroke()
           ctx.restore()
         }
