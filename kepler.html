@@ -2,6 +2,7 @@
 <html>
   <head>
     <title>Kepler Model of the Solar System</title>
+    <meta charset="us-ascii">
   </head>
 
   <body>
@@ -157,24 +158,43 @@
     <script type="text/javascript">
       "use strict"
 
+      /* FIXME: Now that we have all the pesky math worked out, let's animate
+       * this thing! */
+
+      function trueAnomaly(mean, ecc) {
+        /* Convert mean anomaly to eccentric anomaly using three iterations of
+         * Newton's method. (Which I assume is good enough?) */
+        var e = mean
+
+        e = mean + ecc * Math.sin(e)
+        e = mean + ecc * Math.sin(e)
+        e = mean + ecc * Math.sin(e)
+
+        /* Convert eccentric anomaly to true anomaly. */
+        return 2 * Math.atan2(
+          Math.sqrt(1 - ecc) * Math.cos(e * 0.5),
+          Math.sqrt(1 + ecc) * Math.sin(e * 0.5)
+        )
+      }
+
       var canvas = document.getElementById("canvas"),
           table  = document.getElementById("bodies"),
           ctx    = canvas.getContext("2d")
 
       ctx.save()
       ctx.translate(canvas.width / 3, canvas.height / 2)
-      ctx.scale(5, 5)
-      ctx.lineWidth = 1 / 5
+      ctx.scale(4, 4)
+      ctx.lineWidth = 1 / 8
 
       var rows = table.getElementsByTagName("tr"),
-          i, cols, per, apo, inc, lon, arg
+          i, cols, per, apo, inc, lon, arg, mae, maj, min, ecc, phi
 
       for(i = 0; i !== rows.length; ++i) {
         cols = rows[i].getElementsByTagName("td")
 
         if(cols.length === 1) {
           ctx.beginPath()
-          ctx.arc(0, 0, 0.0625, 0, 2 * Math.PI, true)
+          ctx.arc(0, 0, 0.5, 0, 2 * Math.PI, true)
           ctx.fill()
         }
 
@@ -184,15 +204,34 @@
           inc = parseFloat(cols[3].textContent) * Math.PI / -180
           lon = parseFloat(cols[4].textContent) * Math.PI / -180
           arg = parseFloat(cols[5].textContent) * Math.PI / -180
+          mae = parseFloat(cols[6].textContent) * Math.PI / -180
+          maj = (apo + per) * 0.5
+          min = Math.sqrt(apo * per)
+          ecc = (apo - per) / (apo + per)
+          phi = trueAnomaly(mae, ecc)
 
           ctx.save()
+
           ctx.rotate(lon)
           ctx.scale(1, Math.cos(inc))
           ctx.rotate(arg)
-          ctx.scale(1, Math.sqrt(per * apo) * 2 / (per + apo))
+          ctx.scale(1, min / maj)
+          ctx.translate(per - maj, 0)
           ctx.beginPath()
-          ctx.arc((per - apo) * 0.5, 0, (per + apo) * 0.5, 0, 2 * Math.PI, true)
+          ctx.arc(0, 0, maj, 0, 2 * Math.PI, true)
           ctx.stroke()
+
+          ctx.rotate(phi)
+          ctx.translate(maj, 0)
+          ctx.rotate(-phi)
+          ctx.scale(1, maj / min)
+          ctx.rotate(-arg)
+          ctx.scale(1, 1 / Math.cos(inc))
+          ctx.rotate(-lon)
+          ctx.beginPath()
+          ctx.arc(0, 0, 0.5, 0, 2 * Math.PI, true)
+          ctx.fill()
+
           ctx.restore()
         }
       }
