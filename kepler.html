@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Kepler Model of the Solar System</title>
     <meta charset="us-ascii">
   </head>
 
@@ -9,364 +8,93 @@
     <canvas id="canvas" width="640" height="480">
     </canvas>
 
-    <table id="bodies">
-      <tr>
-        <th>Body</th>
-        <th>Periapsis</th>
-        <th>Apoapsis</th>
-        <th><i>P</i></th>
-        <th><i>M</i></th>
-        <th><i>i</i></th>
-        <th>&Omega;</th>
-        <th>&omega;</th>
-      </tr>
-
-      <tr>
-        <td>Sol</td>
-      </tr>
-
-      <tr>
-        <td>Mercury</td>
-        <td>0.307499 AU</td>
-        <td>0.466697 AU</td>
-        <td>87.969 d</td>
-        <td>174.796&deg;</td>
-        <td>7.005&deg;</td>
-        <td>48.331&deg;</td>
-        <td>29.124&deg;</td>
-      </tr>
-
-      <tr>
-        <td>Venus</td>
-        <td>0.728213 AU</td>
-        <td>0.718440 AU</td>
-        <td>224.698 d</td>
-        <td>50.115&deg;</td>
-        <td>3.39458&deg;</td>
-        <td>76.678&deg;</td>
-        <td>55.186&deg;</td>
-      </tr>
-
-      <tr>
-        <td>Earth</td>
-        <td>0.98329134 AU</td>
-        <td>1.01671388 AU</td>
-        <td>365.256363004 d</td>
-        <td>357.51716&deg;</td>
-        <td>0&deg;</td>
-        <td>348.73936&deg;</td>
-        <td>114.20783&deg;</td>
-      </tr>
-
-      <tr>
-        <td>Mars</td>
-        <td>1.381497 AU</td>
-        <td>1.665861 AU</td>
-        <td>686.971 d</td>
-        <td>19.3564&deg;</td>
-        <td>1.85&deg;</td>
-        <td>49.562&deg;</td>
-        <td>286.537&deg;</td>
-      </tr>
-
-      <tr>
-        <td>Vesta</td>
-        <td>2.1526 AU</td>
-        <td>2.571 AU</td>
-        <td>1325.85 d</td>
-        <td>307.80&deg;</td>
-        <td>7.134&deg;</td>
-        <td>103.91&deg;</td>
-        <td>149.84&deg;</td>
-      </tr>
-
-      <tr>
-        <td>Pallas</td>
-        <td>2.132 AU</td>
-        <td>3.412 AU</td>
-        <td>1685.87 d</td>
-        <td>96.15&deg;</td>
-        <td>34.841&deg;</td>
-        <td>173.12&deg;</td>
-        <td>310.15&deg;</td>
-      </tr>
-
-      <tr>
-        <td>Ceres</td>
-        <td>2.5468 AU</td>
-        <td>2.9858 AU</td>
-        <td>1679.67 d</td>
-        <td>113.410&deg;</td>
-        <td>10.587&deg;</td>
-        <td>80.3932&deg;</td>
-        <td>72.5898&deg;</td>
-      </tr>
-
-      <tr>
-        <td>Hygiea</td>
-        <td>2.770 AU</td>
-        <td>3.507 AU</td>
-        <td>2031.01 d</td>
-        <td>197.96&deg;</td>
-        <td>3.842&deg;</td>
-        <td>283.45&deg;</td>
-        <td>313.19&deg;</td>
-      </tr>
-
-      <tr>
-        <td>Jupiter</td>
-        <td>4.950429 AU</td>
-        <td>5.458104 AU</td>
-        <td>4332.59 d</td>
-        <td>18.818&deg;</td>
-        <td>1.305&deg;</td>
-        <td>100.492&deg;</td>
-        <td>275.066&deg;</td>
-      </tr>
-
-      <tr>
-        <td>Saturn</td>
-        <td>9.04807635 AU</td>
-        <td>10.11595804 AU</td>
-        <td>10759.22 d</td>
-        <td>320.346750&deg;</td>
-        <td>2.48524&deg;</td>
-        <td>113.642811&deg;</td>
-        <td>336.013862&deg;</td>
-      </tr>
-
-      <tr>
-        <td>Uranus</td>
-        <td>18.37551863 AU</td>
-        <td>20.08330526 AU</td>
-        <td>30799.095 d</td>
-        <td>142.955717&deg;</td>
-        <td>0.772556&deg;</td>
-        <td>73.989821&deg;</td>
-        <td>96.541318&deg;</td>
-      </tr>
-
-      <tr>
-        <td>Neptune</td>
-        <td>29.76607095 AU</td>
-        <td>30.44125206 AU</td>
-        <td>60190.03 d</td>
-        <td>267.767281&deg;</td>
-        <td>1.767975&deg;</td>
-        <td>131.794310&deg;</td>
-        <td>265.646853&deg;</td>
-      </tr>
-
-      <tr>
-        <td>Pluto</td>
-        <td>29.657 AU</td>
-        <td>48.871 AU</td>
-        <td>89865.65 d</td>
-        <td>14.86012204&deg;</td>
-        <td>17.151394&deg;</td>
-        <td>110.28683&deg;</td>
-        <td>113.76349&deg;</td>
-      </tr>
-
-      <tr>
-        <td>Huya</td>
-        <td>28.520 AU</td>
-        <td>50.363 AU</td>
-        <td>90477 d</td>
-        <td>352.38&deg;</td>
-        <td>15.487&deg;</td>
-        <td>169.40&deg;</td>
-        <td>68.169&deg;</td>
-      </tr>
-
-      <tr>
-        <td>Ixion</td>
-        <td>30.091 AU</td>
-        <td>49.269 AU</td>
-        <td>91295.847 d</td>
-        <td>268.546&deg;</td>
-        <td>19.584&deg;</td>
-        <td>71.028&deg;</td>
-        <td>298.779&deg;</td>
-      </tr>
-
-      <tr>
-        <td>Orcus</td>
-        <td>30.27 AU</td>
-        <td>48.07 AU</td>
-        <td>89552 d</td>
-        <td>166.38&deg;</td>
-        <td>20.573&deg;</td>
-        <td>268.606&deg;</td>
-        <td>73.031&deg;</td>
-      </tr>
-
-      <tr>
-        <td>Haumea</td>
-        <td>34.721 AU</td>
-        <td>51.544 AU</td>
-        <td>103468 d</td>
-        <td>202.67&deg;</td>
-        <td>28.22&deg;</td>
-        <td>121.10&deg;</td>
-        <td>239.18&deg;</td>
-      </tr>
-
-      <tr>
-        <td>Salacia</td>
-        <td>37.8383 AU</td>
-        <td>46.5395 AU</td>
-        <td>100091 d</td>
-        <td>113.75&deg;</td>
-        <td>23.9396&deg;</td>
-        <td>280.1885&deg;</td>
-        <td>311.078&deg;</td>
-      </tr>
-
-      <tr>
-        <td>Makemake</td>
-        <td>38.509 AU</td>
-        <td>53.074 AU</td>
-        <td>113183 d</td>
-        <td>85.13&deg;</td>
-        <td>28.96&deg;</td>
-        <td>79.382&deg;</td>
-        <td>298.41&deg;</td>
-      </tr>
-
-      <tr>
-        <td>Eris</td>
-        <td>38.375 AU</td>
-        <td>97.65 AU</td>
-        <td>204870 d</td>
-        <td>202.75388&deg;</td>
-        <td>43.844&deg;</td>
-        <td>36.051&deg;</td>
-        <td>150.809&deg;</td>
-      </tr>
-
-      <tr>
-        <td>Varuna</td>
-        <td>40.494 AU</td>
-        <td>45.313 AU</td>
-        <td>102646.1 d</td>
-        <td>101.764&deg;</td>
-        <td>17.2&deg;</td>
-        <td>97.303&deg;</td>
-        <td>266.736&deg;</td>
-      </tr>
-
-      <tr>
-        <td>Chaos</td>
-        <td>40.929 AU</td>
-        <td>50.269 AU</td>
-        <td>112898.99415 d</td>
-        <td>324.2844&deg;</td>
-        <td>12.0550&deg;</td>
-        <td>50.0103&deg;</td>
-        <td>58.6836&deg;</td>
-      </tr>
-
-      <tr>
-        <td>Quaoar</td>
-        <td>41.695 AU</td>
-        <td>45.116 AU</td>
-        <td>104451.3 d</td>
-        <td>280.554&deg;</td>
-        <td>7.996&deg;</td>
-        <td>189.033&deg;</td>
-        <td>155.624&deg;</td>
-      </tr>
-
-      <tr>
-        <td>Sedna</td>
-        <td>76.361 AU</td>
-        <td>937 AU</td>
-        <td>4163850 d</td>
-        <td>358.01&deg;</td>
-        <td>11.927&deg;</td>
-        <td>144.26&deg;</td>
-        <td>311.02&deg;</td>
-      </tr>
-    </table>
-
     <script type="text/javascript">
-      "use strict"
-
-      var TWO_PI = 2 * Math.PI
-
-      function trueAnomaly(mean, ecc) {
-        /* Convert mean anomaly to eccentric anomaly using three iterations of
-         * Newton's method. (Which I assume is good enough?) */
-        var e = mean
-
-        e = mean + ecc * Math.sin(e)
-        e = mean + ecc * Math.sin(e)
-        e = mean + ecc * Math.sin(e)
-
-        /* Convert eccentric anomaly to true anomaly. */
-        return 2 * Math.atan2(
-          Math.sqrt(1 - ecc) * Math.cos(e * 0.5),
-          Math.sqrt(1 + ecc) * Math.sin(e * 0.5)
-        )
-      }
+      var TWO_PI  = 2 * Math.PI,
+          RADIANS = Math.PI / 180
 
       function Body(name) {
-        this.name = name
+        this.name     = name
+        this.children = []
+      }
+
+      Body.prototype.addChild = function(child) {
+        this.children.push(child)
       }
 
       Body.prototype.draw = function(ctx, t) {
+        var i
+
         ctx.beginPath()
-        ctx.arc(0, 0, 0.5, 0, TWO_PI, true)
+        ctx.arc(0, 0, 0.03125, 0, TWO_PI, true)
         ctx.fill()
+
+        for(i = this.children.length; i--; )
+          this.children[i].draw(ctx, t)
       }
 
-      function KeplerBody(name, periapsis, apoapsis, period, meanAnomaly, inclination, longitude, argument) {
-        this.name           = name
-        this.periapsis      = periapsis
-        this.apoapsis       = apoapsis
-        this.semimajor      = (apoapsis + periapsis) * 0.5
-        this.semiminor      = Math.sqrt(apoapsis * periapsis)
-        this.minorToMajor   = this.semiminor / this.semimajor
-        this.majorToMinor   = this.semimajor / this.semiminor
-        this.eccentricity   = (apoapsis - periapsis) / (apoapsis + periapsis)
-        this.offset         = periapsis - this.semimajor
-        this.period         = period
-        this.meanAnomaly    = meanAnomaly
-        this.inclination    = inclination
-        this.compression    = Math.cos(inclination)
-        this.invCompression = 1 / this.compression
-        this.longitude      = longitude
-        this.argument       = argument
+      function KeplerBody(
+        name,
+        eccentricity,
+        periapsis,
+        inclination,
+        longitudeOfAscendingNode,
+        argumentOfPerifocus,
+        timeOfPeriapsis,
+        meanMotion,
+        meanAnomaly,
+        trueAnomaly,
+        semimajor,
+        apoapsis,
+        period
+      ) {
+        Body.call(this, name)
+        this.periapsis    = periapsis
+        this.apoapsis     = apoapsis
+        this.semimajor    = semimajor
+        this.semiminor    = Math.sqrt(periapsis * apoapsis)
+        this.eccentricity = eccentricity
+        this.inclination  = inclination * RADIANS
+        this.longitude    = longitudeOfAscendingNode * RADIANS
+        this.argument     = argumentOfPerifocus * RADIANS
+        this.meanAnomaly  = meanAnomaly * RADIANS
+        this.meanMotion   = meanMotion * RADIANS
       }
+
+      KeplerBody.prototype.__proto__ = Body.prototype
 
       KeplerBody.prototype.draw = function(ctx, t) {
-        /* FIXME: I added a PI here so that everything would be fastest at the
-         * perihelion. Check my math and see if the mean anomalies at epoch
-         * come out right. */
-        var phi = Math.PI + trueAnomaly(
-              this.meanAnomaly + TWO_PI * t / this.period,
-              this.eccentricity
+        var meanAnomaly = this.meanAnomaly + this.meanMotion * t,
+            eccAnomaly  = meanAnomaly
+
+        eccAnomaly = meanAnomaly + this.eccentricity * Math.sin(eccAnomaly)
+        eccAnomaly = meanAnomaly + this.eccentricity * Math.sin(eccAnomaly)
+
+        var trueAnomaly = Math.PI - 2 * Math.atan2(
+              Math.sqrt(1 - this.eccentricity) * Math.cos(eccAnomaly * 0.5),
+              Math.sqrt(1 + this.eccentricity) * Math.sin(eccAnomaly * 0.5)
             )
 
         ctx.save()
+        ctx.rotate(-this.longitude)
+        ctx.scale(1, Math.cos(this.inclination))
+        ctx.rotate(-this.argument)
+        ctx.translate(this.periapsis - this.semimajor, 0)
+        ctx.scale(1, this.semiminor / this.semimajor)
 
-        ctx.rotate(this.longitude)
-        ctx.scale(1, this.compression)
-        ctx.rotate(this.argument)
-        ctx.translate(this.offset, 0)
-        ctx.scale(1, this.minorToMajor)
+        /*
         ctx.beginPath()
         ctx.arc(0, 0, this.semimajor, 0, TWO_PI, true)
         ctx.stroke()
+        */
 
-        ctx.rotate(phi)
+        ctx.rotate(-trueAnomaly)
         ctx.translate(this.semimajor, 0)
-        ctx.rotate(-phi)
-        ctx.scale(1, this.majorToMinor)
-        ctx.rotate(-this.argument)
-        ctx.scale(1, this.invCompression)
-        ctx.rotate(-this.longitude)
+        ctx.rotate(trueAnomaly)
+        ctx.scale(1, this.semimajor / this.semiminor)
+        ctx.rotate(this.argument)
+        ctx.scale(1, 1 / Math.cos(this.inclination))
+        ctx.rotate(this.longitude)
+
         Body.prototype.draw.call(this, ctx, t)
 
         ctx.restore()
@@ -374,44 +102,194 @@
 
       var canvas = document.getElementById("canvas"),
           ctx    = canvas.getContext("2d"),
-          table  = document.getElementById("bodies"),
-          rows   = table.getElementsByTagName("tr"),
-          bodies = [],
-          i, cols, start
+          sol    = new Body("Sol"),
+          start
 
-      for(i = 0; i !== rows.length; ++i) {
-        cols = rows[i].getElementsByTagName("td")
+      sol.addChild(new KeplerBody(
+        "Mercury",
+         2.056302942128498E-01, 3.074990929205437E-01, 7.005015817746640E+00,
+         4.833054124561678E+01, 2.912427858919899E+01,  2451502.287121505011,
+         4.092346153579799E+00, 1.747958840172690E+02, 1.764950870217263E+02,
+         3.870982121804850E-01, 4.666973314404263E-01, 8.796909804051847E+01
+      ))
 
-        if(cols.length === 1)
-          bodies.push(new Body(cols[0].textContent))
+      sol.addChild(new KeplerBody(
+        "Venus",
+        6.755786580298123E-03, 7.184402851373205E-01, 3.394589972387207E+00,
+        7.667838198116145E+01, 5.518595780861867E+01,  2451513.720261435956,
+        1.602148088396929E+00, 5.011477334622277E+01, 5.071202975369376E+01,
+        7.233269274872068E-01, 7.282135698370932E-01, 2.246983300777193E+02
+      ))
 
-        else if(cols.length === 8)
-          bodies.push(new KeplerBody(
-            cols[0].textContent,
-            parseFloat(cols[1].textContent),
-            parseFloat(cols[2].textContent),
-            parseFloat(cols[3].textContent),
-            parseFloat(cols[4].textContent) * Math.PI / -180,
-            parseFloat(cols[5].textContent) * Math.PI / -180,
-            parseFloat(cols[6].textContent) * Math.PI / -180,
-            parseFloat(cols[7].textContent) * Math.PI / -180
-          ))
-      }
+      sol.addChild(new KeplerBody(
+        "Earth",
+        1.711862907035846E-02, 9.833225165510696E-01, 4.185450226517964E-04,
+        1.351086207541469E+02, 3.267003161387815E+02,  2451546.403877350502,
+        9.849459659243318E-01, 3.586172566668234E+02, 3.585688860932975E+02,
+        1.000448828957874E+00, 1.017575141364678E+00, 3.655022838355956E+02
+      ))
+
+      sol.addChild(new KeplerBody(
+        "Mars",
+        9.331510163651754E-02, 1.381496733245213E+00, 1.849876432291736E+00,
+        4.956200626315645E+01, 2.865373825700824E+02,  2451508.062923411839,
+        5.240393796687103E-01, 1.935648270200058E+01, 2.333319659853387E+01,
+        1.523678993373266E+00, 1.665861253501319E+00, 6.869712734710633E+02
+      ))
+
+      sol.addChild(new KeplerBody(
+        "Ceres",
+        7.837566697457678E-02, 2.549670050504195E+00, 1.058335865297779E+01,
+        8.049435901962407E+01, 7.392282742613564E+01,  2451516.163243680727,
+        2.141948373214937E-01, 6.176684328649046E+00, 7.246717240568533E+00,
+        2.766496021360866E+00, 2.983321992217538E+00, 1.680712777683159E+03
+      ))
+
+      sol.addChild(new KeplerBody(
+        "Vesta",
+        9.002243690231450E-02, 2.148943809018091E+00, 7.133933887603245E+00,
+        1.039514574792090E+02, 1.495866294106253E+02,  2451614.870770818554,
+        2.715892093873926E-01, 3.410238525941048E+02, 3.372748455329115E+02,
+        2.361534939062452E+00, 2.574126069106812E+00, 1.325531308154806E+03
+      ))
+
+      sol.addChild(new KeplerBody(
+        "Pallas",
+        2.296435661959941E-01, 2.135676465810611E+00, 3.484613627101812E+01,
+        1.731978001601968E+02, 3.102656523782881E+02,  2451577.969891834073,
+        2.135199465215411E-01, 3.529602704587259E+02, 3.484836290785369E+02,
+        2.772322488779227E+00, 3.408968511747843E+00, 1.686025150646435E+03
+      ))
+
+      sol.addChild(new KeplerBody(
+        "Hygeia",
+        1.194647813114173E-01, 2.763490530878634E+00, 3.842649982800825E+00,
+        2.836631704969067E+02, 3.143682691341799E+02,  2451662.251063035801,
+        1.772707978371678E-01, 3.392148105083789E+02, 3.335838652200588E+02,
+        3.138421351271348E+00, 3.513352171664062E+00, 2.030791333892896E+03
+      ))
+
+      sol.addChild(new KeplerBody(
+        "Euphrosyne",
+        2.277646536287345E-01, 2.429577276817824E+00, 2.634519016249014E+01,
+        3.129177622076273E+01, 6.235091533117577E+01,  2451978.981350477319,
+        1.766170035528352E-01, 2.833515142808992E+02, 2.571284841129606E+02,
+        3.146161708648030E+00, 3.862746140478237E+00, 2.038308842060643E+03
+      ))
+
+      sol.addChild(new KeplerBody(
+        "Interamnia",
+        1.461352345506762E-01, 2.616224813639418E+00, 1.732332691440113E+01,
+        2.806565036601603E+02, 9.451457280866907E+01,  2452183.905824447982,
+        1.837702146279859E-01, 2.425881395140818E+02, 2.290055381565955E+02,
+        3.063980292315609E+00, 3.511735770991800E+00, 1.958968164284749E+03
+      ))
+
+      sol.addChild(new KeplerBody(
+        "Davida",
+        1.830778709199325E-01, 2.589650379514559E+00, 1.594246848285670E+01,
+        1.077642275873270E+02, 3.388845439377725E+02,  2450525.383035807870,
+        1.746277915704620E-01, 1.780534587046598E+02, 1.786327358434080E+02,
+        3.170008850697621E+00, 3.750367321880685E+00, 2.061527530998641E+03
+      ))
+
+      sol.addChild(new KeplerBody(
+        "Eunomia",
+        1.862037130643558E-01, 2.151467083240580E+00, 1.174734104759529E+01,
+        2.935162203671445E+02, 9.696007749174301E+01,  2451077.620284584351,
+        2.292849615897351E-01, 1.071631400968843E+02, 1.259011589672746E+02,
+        2.643741582235458E+00, 3.136016081230335E+00, 1.570098612241986E+03
+      ))
+
+      sol.addChild(new KeplerBody(
+        "Juno",
+        2.584434357428058E-01, 1.978498799234980E+00, 1.296741968628721E+01,
+        1.701726367410528E+02, 2.480316934302164E+02,  2452074.408816703595,
+        2.261605297727743E-01, 2.402686215479762E+02, 2.186286873192898E+02,
+        2.668034907380008E+00, 3.357571015525036E+00, 1.591789691869291E+03
+      ))
+
+      sol.addChild(new KeplerBody(
+        "Herculina",
+        1.770850959814179E-01, 2.280821462374452E+00, 1.630609464038328E+01,
+        1.076625246529934E+02, 7.674743338013862E+01,  2451934.345034935512,
+        2.135991545694943E-01, 2.768362297019485E+02, 2.565751634875400E+02,
+        2.771637080865107E+00, 3.262452699355761E+00, 1.685399929253345E+03
+      ))
+
+      sol.addChild(new KeplerBody(
+        "Psyche",
+        1.382418390491949E-01, 2.516821072752696E+00, 3.093366419227233E+00,
+        1.504660317786795E+02, 2.291189588995035E+02,  2451668.601715288591,
+        1.974711561910514E-01, 3.355922263747851E+02, 3.278587607737162E+02,
+        2.920565405468058E+00, 3.324309738183420E+00, 1.823051056893107E+03
+      ))
+
+      sol.addChild(new KeplerBody(
+        "Europa",
+        1.009761297624277E-01, 2.785973343289546E+00, 7.467845556830303E+00,
+        1.290465133474808E+02, 3.423292737476411E+02,  2451308.984697318636,
+        1.806739224727346E-01, 4.264181049901781E+01, 5.124593016424446E+01,
+        3.098886954529179E+00, 3.411800565768812E+00, 1.992539903229961E+03
+      ))
+
+      sol.addChild(new KeplerBody(
+        "Cybele",
+        1.036042503720009E-01, 3.078104438974397E+00, 3.547631164669576E+00,
+        1.558389915789920E+02, 1.064565471467691E+02,  2452297.245012244210,
+        1.548919081607094E-01, 2.434833346491149E+02, 2.334923325621526E+02,
+        3.433867731135271E+00, 3.789631023296145E+00, 2.324201465879540E+03
+      ))
+
+      sol.addChild(new KeplerBody(
+        "Doris",
+        7.375069592636554E-02, 2.878551838834422E+00, 6.548881667192425E+00,
+        1.839611487217368E+02, 2.604648009833716E+02,  2452246.387597824913,
+        1.799015203324987E-01, 2.338193048089029E+02, 2.273641631647255E+02,
+        3.107750609014854E+00, 3.336949379195286E+00, 2.001094817512595E+03
+      ))
+
+      sol.addChild(new KeplerBody(
+        "Egeria",
+        8.490106399898487E-02, 2.358237588842647E+00, 1.654143541006942E+01,
+        4.332538127900983E+01, 8.050572468040001E+01,  2451771.261596146971,
+        2.382455586314615E-01, 3.060941796291174E+02, 2.977398615270104E+02,
+        2.577030194295878E+00, 2.795822799749109E+00, 1.511046006766819E+03
+      ))
+
+      sol.addChild(new KeplerBody(
+        "Iris",
+        2.303982831122700E-01, 1.835759444786123E+00, 5.524144818703846E+00,
+        2.598742641308049E+02, 1.450800581035616E+02,  2451345.389263205230,
+        2.675342931692665E-01, 5.340271737741614E+01, 7.814170220964974E+01,
+        2.385336992503000E+00, 2.934914540219876E+00, 1.345621885461358E+03
+      ))
+
+      sol.addChild(new KeplerBody(
+        "Diotima",
+        4.040505060810961E-02, 2.941373839493492E+00, 1.124019900031334E+01,
+        6.958375908152195E+01, 2.096282800444803E+02,  2452433.216053846758,
+        1.836583447668503E-01, 1.968717097551836E+02, 1.955900902721701E+02,
+        3.065224385932298E+00, 3.189074932371104E+00, 1.960161409801505E+03
+      ))
+
+      sol.addChild(new KeplerBody(
+        "Sylvia",
+        7.994419867334075E-02, 3.207973518905905E+00, 1.085888457141809E+01,
+        7.334295592511063E+01, 2.674493005897960E+02,  2450878.457644512877,
+        1.513837168589918E-01, 1.009036592176001E+02, 1.096976354321030E+02,
+        3.486716255992540E+00, 3.765458993079174E+00, 2.378062895201116E+03
+      ))
 
       start = Date.now()
       setInterval(function() {
-        var sec = (Date.now() - start) * 0.001
+        var day = (Date.now() - start) * 0.001
 
-        ctx.clearRect(0, 0, canvas.width, canvas.height)
-
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
         ctx.save()
-        ctx.translate(canvas.width / 3, canvas.height / 2)
-        ctx.scale(4, 4)
-        ctx.lineWidth = 0.5 / 4
-
-        for(i = bodies.length; i--; )
-          bodies[i].draw(ctx, sec * 365.25)
-
+        ctx.translate(ctx.canvas.width * 0.5, ctx.canvas.height * 0.5)
+        ctx.scale(72, 72)
+        sol.draw(ctx, day * 365.25 / 12)
         ctx.restore()
       }, 1000 / 60)
     </script>
