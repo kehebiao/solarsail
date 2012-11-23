@@ -216,8 +216,7 @@
     <script type="text/javascript">
       "use strict"
 
-      /* FIXME: Now that we have all the pesky math worked out, let's animate
-       * this thing! */
+      var TWO_PI = 2 * Math.PI
 
       function trueAnomaly(mean, ecc) {
         /* Convert mean anomaly to eccentric anomaly using three iterations of
@@ -235,67 +234,109 @@
         )
       }
 
+      function Body(name) {
+        this.name = name
+      }
+
+      Body.prototype.draw = function(ctx, t) {
+        ctx.beginPath()
+        ctx.arc(0, 0, 0.5, 0, TWO_PI, true)
+        ctx.fill()
+      }
+
+      function KeplerBody(name, periapsis, apoapsis, period, meanAnomaly, inclination, longitude, argument) {
+        this.name           = name
+        this.periapsis      = periapsis
+        this.apoapsis       = apoapsis
+        this.semimajor      = (apoapsis + periapsis) * 0.5
+        this.semiminor      = Math.sqrt(apoapsis * periapsis)
+        this.minorToMajor   = this.semiminor / this.semimajor
+        this.majorToMinor   = this.semimajor / this.semiminor
+        this.eccentricity   = (apoapsis - periapsis) / (apoapsis + periapsis)
+        this.offset         = periapsis - this.semimajor
+        this.period         = period
+        this.meanAnomaly    = meanAnomaly
+        this.inclination    = inclination
+        this.compression    = Math.cos(inclination)
+        this.invCompression = 1 / this.compression
+        this.longitude      = longitude
+        this.argument       = argument
+      }
+
+      KeplerBody.prototype.draw = function(ctx, t) {
+        /* FIXME: I added a PI here so that everything would be fastest at the
+         * perihelion. Check my math and see if the mean anomalies at epoch
+         * come out right. */
+        var phi = Math.PI + trueAnomaly(
+              this.meanAnomaly + TWO_PI * t / this.period,
+              this.eccentricity
+            )
+
+        ctx.save()
+
+        ctx.rotate(this.longitude)
+        ctx.scale(1, this.compression)
+        ctx.rotate(this.argument)
+        ctx.translate(this.offset, 0)
+        ctx.scale(1, this.minorToMajor)
+        ctx.beginPath()
+        ctx.arc(0, 0, this.semimajor, 0, TWO_PI, true)
+        ctx.stroke()
+
+        ctx.rotate(phi)
+        ctx.translate(this.semimajor, 0)
+        ctx.rotate(-phi)
+        ctx.scale(1, this.majorToMinor)
+        ctx.rotate(-this.argument)
+        ctx.scale(1, this.invCompression)
+        ctx.rotate(-this.longitude)
+        Body.prototype.draw.call(this, ctx, t)
+
+        ctx.restore()
+      }
+
       var canvas = document.getElementById("canvas"),
+          ctx    = canvas.getContext("2d"),
           table  = document.getElementById("bodies"),
-          ctx    = canvas.getContext("2d")
-
-      ctx.save()
-      ctx.translate(canvas.width / 3, canvas.height / 2)
-      ctx.scale(4, 4)
-      ctx.lineWidth = 1 / 8
-
-      var rows = table.getElementsByTagName("tr"),
-          i, cols, per, apo, p, mae, inc, lon, arg, maj, min, ecc, phi
+          rows   = table.getElementsByTagName("tr"),
+          bodies = [],
+          i, cols, start
 
       for(i = 0; i !== rows.length; ++i) {
         cols = rows[i].getElementsByTagName("td")
 
-        if(cols.length === 1) {
-          ctx.beginPath()
-          ctx.arc(0, 0, 0.5, 0, 2 * Math.PI, true)
-          ctx.fill()
-        }
+        if(cols.length === 1)
+          bodies.push(new Body(cols[0].textContent))
 
-        else if(cols.length === 8) {
-          per = parseFloat(cols[1].textContent)
-          apo = parseFloat(cols[2].textContent)
-          p   = parseFloat(cols[3].textContent)
-          mae = parseFloat(cols[4].textContent) * Math.PI / -180
-          inc = parseFloat(cols[5].textContent) * Math.PI / -180
-          lon = parseFloat(cols[6].textContent) * Math.PI / -180
-          arg = parseFloat(cols[7].textContent) * Math.PI / -180
-          maj = (apo + per) * 0.5
-          min = Math.sqrt(apo * per)
-          ecc = (apo - per) / (apo + per)
-          phi = trueAnomaly(mae + 2 * Math.PI * 0 / p, ecc)
-
-          ctx.save()
-
-          ctx.rotate(lon)
-          ctx.scale(1, Math.cos(inc))
-          ctx.rotate(arg)
-          ctx.scale(1, min / maj)
-          ctx.translate(per - maj, 0)
-          ctx.beginPath()
-          ctx.arc(0, 0, maj, 0, 2 * Math.PI, true)
-          ctx.stroke()
-
-          ctx.rotate(phi)
-          ctx.translate(maj, 0)
-          ctx.rotate(-phi)
-          ctx.scale(1, maj / min)
-          ctx.rotate(-arg)
-          ctx.scale(1, 1 / Math.cos(inc))
-          ctx.rotate(-lon)
-          ctx.beginPath()
-          ctx.arc(0, 0, 0.5, 0, 2 * Math.PI, true)
-          ctx.fill()
-
-          ctx.restore()
-        }
+        else if(cols.length === 8)
+          bodies.push(new KeplerBody(
+            cols[0].textContent,
+            parseFloat(cols[1].textContent),
+            parseFloat(cols[2].textContent),
+            parseFloat(cols[3].textContent),
+            parseFloat(cols[4].textContent) * Math.PI / -180,
+            parseFloat(cols[5].textContent) * Math.PI / -180,
+            parseFloat(cols[6].textContent) * Math.PI / -180,
+            parseFloat(cols[7].textContent) * Math.PI / -180
+          ))
       }
 
-      ctx.restore()
+      start = Date.now()
+      setInterval(function() {
+        var sec = (Date.now() - start) * 0.001
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+        ctx.save()
+        ctx.translate(canvas.width / 3, canvas.height / 2)
+        ctx.scale(4, 4)
+        ctx.lineWidth = 0.5 / 4
+
+        for(i = bodies.length; i--; )
+          bodies[i].draw(ctx, sec * 365.25)
+
+        ctx.restore()
+      }, 1000 / 60)
     </script>
   </body>
 </html>
