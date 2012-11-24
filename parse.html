@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="us-ascii">
+  </head>
+
+  <body>
+    <canvas id="canvas" width="640" height="480">
+    </canvas>
+
+    <script type="text/javascript">
+      var TWO_PI  = 2 * Math.PI,
+          SQRT_GM = 0.017202098948448492
+
+      function request(url, callback) {
+        var req = new XMLHttpRequest()
+
+        req.onreadystatechange = function() {
+          if(req.readyState === 4)
+            callback(
+              req.status !== 0 && req.status !== 200 ?
+                new Error("Received status " + req.status + " from server.") :
+                undefined,
+              req.responseText
+            )
+        }
+
+        req.overrideMimeType("text/plain")
+        req.open("GET", url)
+        req.send()
+      }
+
+      function parse(data) {
+        var rad   = Math.PI / 180,
+            regex = /^.{6} (.{17}) (.{5}) (.{10}) (.{10}) (.{9}) (.{9}) (.{9}) (.{11}) (.{5})/gm,
+            array = [],
+            match
+
+        if(regex.exec(data) && regex.exec(data))
+          while(match = regex.exec(data)) {
+            array.push(
+              parseFloat(match[2]),
+              parseFloat(match[3]),
+              parseFloat(match[4]),
+              Math.cos(parseFloat(match[5]) * rad),
+              parseFloat(match[6]) * rad,
+              parseFloat(match[7]) * rad,
+              parseFloat(match[8]) * rad,
+              0.03125 /* FIXME */
+            )
+
+            /* FIXME */
+            if(array.length === 8000)
+              break
+          }
+
+        return array
+      }
+
+      function drawKepler(ctx, t, arr, offset) {
+        var o = arr[offset++],
+            a = arr[offset++],
+            e = arr[offset++],
+            p = arr[offset++],
+            w = arr[offset++],
+            l = arr[offset++],
+            m = arr[offset++],
+            r = arr[offset++]
+
+        t -= o
+        m += t * SQRT_GM / Math.sqrt(a * a * a)
+        o  = m
+        o  = m + e * Math.sin(o)
+        o  = m + e * Math.sin(o)
+        o *= 0.5
+        o  = Math.PI - 2 * Math.atan2(
+          Math.sqrt(1 - e) * Math.cos(o),
+          Math.sqrt(1 + e) * Math.sin(o)
+        )
+        t  = Math.sqrt(1 - e * e)
+
+        ctx.save()
+
+        ctx.rotate(-l)
+        ctx.scale(1, p)
+        ctx.rotate(-w)
+        ctx.translate(-(a * e), 0)
+        ctx.scale(1, t)
+
+        /*
+        ctx.beginPath()
+        ctx.arc(0, 0, a, 0, TWO_PI, true)
+        ctx.stroke()
+        */
+
+        ctx.rotate(-o)
+        ctx.translate(a, 0)
+        ctx.rotate(o)
+        ctx.scale(1, 1 / t)
+        ctx.rotate(w)
+        ctx.scale(1, 1 / p)
+        ctx.rotate(l)
+
+        /*
+        ctx.beginPath()
+        ctx.arc(0, 0, r, 0, TWO_PI, true)
+        ctx.fill()
+        */
+
+        ctx.fillRect(-r, -r, r + r, r + r)
+
+        ctx.restore()
+      }
+
+      function drawKeplerArray(ctx, t, arr) {
+        var i = arr.length
+
+        while(i) {
+          i -= 8
+          drawKepler(ctx, t, arr, i)
+        }
+      }
+
+      request("orbital-elements.txt", function(err, data) {
+        if(err)
+          throw err
+
+        data = parse(data)
+
+        var canvas = document.getElementById("canvas"),
+            ctx    = canvas.getContext("2d"),
+            start  = Date.now()
+
+        setInterval(function() {
+          var t = 51544 + (Date.now() - start) * 0.001 * 365.25 / 12
+
+          ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+          ctx.save()
+          ctx.translate(ctx.canvas.width * 0.5, ctx.canvas.height * 0.5)
+          ctx.scale(64, 64)
+          drawKeplerArray(ctx, t, data)
+          ctx.restore()
+        }, 0)
+      })
+    </script>
+  </body>
+</html>
