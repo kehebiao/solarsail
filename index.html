@@ -11,7 +11,8 @@
 
     <script type="text/javascript">
       var TWO_PI  = 2 * Math.PI,
-          RADIANS = Math.PI / 180
+          RADIANS = Math.PI / 180,
+          SQRT_GM = 0.017202098948448492
 
       function Body(name, radius) {
         this.name     = name
@@ -51,22 +52,18 @@
         period
       ) {
         Body.call(this, name, radius)
-        this.periapsis    = periapsis
-        this.apoapsis     = apoapsis
         this.semimajor    = semimajor
-        this.semiminor    = Math.sqrt(periapsis * apoapsis)
         this.eccentricity = eccentricity
         this.inclination  = inclination * RADIANS
         this.longitude    = longitudeOfAscendingNode * RADIANS
         this.argument     = argumentOfPerifocus * RADIANS
         this.meanAnomaly  = meanAnomaly * RADIANS
-        this.meanMotion   = meanMotion * RADIANS
       }
 
       KeplerBody.prototype.__proto__ = Body.prototype
 
       KeplerBody.prototype.draw = function(ctx, t) {
-        var meanAnomaly = this.meanAnomaly + this.meanMotion * t,
+        var meanAnomaly = this.meanAnomaly + t * SQRT_GM / Math.sqrt(this.semimajor * this.semimajor * this.semimajor),
             eccAnomaly  = meanAnomaly
 
         eccAnomaly = meanAnomaly + this.eccentricity * Math.sin(eccAnomaly)
@@ -76,14 +73,16 @@
         var trueAnomaly = Math.PI - 2 * Math.atan2(
               Math.sqrt(1 - this.eccentricity) * Math.cos(eccAnomaly * 0.5),
               Math.sqrt(1 + this.eccentricity) * Math.sin(eccAnomaly * 0.5)
-            )
+            ),
+            projection  = Math.cos(this.inclination),
+            axisRatio   = Math.sqrt(1 - this.eccentricity * this.eccentricity)
 
         ctx.save()
         ctx.rotate(-this.longitude)
-        ctx.scale(1, Math.cos(this.inclination))
+        ctx.scale(1, projection)
         ctx.rotate(-this.argument)
-        ctx.translate(this.periapsis - this.semimajor, 0)
-        ctx.scale(1, this.semiminor / this.semimajor)
+        ctx.translate(-(this.semimajor * this.eccentricity), 0)
+        ctx.scale(1, axisRatio)
 
         /*
         ctx.beginPath()
@@ -94,9 +93,9 @@
         ctx.rotate(-trueAnomaly)
         ctx.translate(this.semimajor, 0)
         ctx.rotate(trueAnomaly)
-        ctx.scale(1, this.semimajor / this.semiminor)
+        ctx.scale(1, 1 / axisRatio)
         ctx.rotate(this.argument)
-        ctx.scale(1, 1 / Math.cos(this.inclination))
+        ctx.scale(1, 1 / projection)
         ctx.rotate(this.longitude)
 
         Body.prototype.draw.call(this, ctx, t)
