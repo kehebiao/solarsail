@@ -37,127 +37,126 @@
             match, h
 
         array.push(
+          2440,
           51544.5,
           0.38709927,
           0.20563593,
           7.00497902 * rad,
           29.12703035 * rad,
           48.33076593 * rad,
-          174.79252722 * rad,
-          2440
+          174.79252722 * rad
         )
 
         array.push(
+          6051.8,
           51544.5,
           0.72333566,
           0.00677672,
           3.39467605 * rad,
           54.92262463 * rad,
           76.67984255 * rad,
-          50.37663232 * rad,
-          6051.8
+          50.37663232 * rad
         )
 
         array.push(
+          6371.01,
           51544.5,
           1.00000261,
           0.01671123,
           -0.00001531 * rad,
           102.93768193 * rad,
           0 * rad,
-          -2.47311027 * rad,
-          6371.01
+          -2.47311027 * rad
         )
 
         array.push(
+          3389.9,
           51544.5,
           1.52371034,
           0.09339410,
           1.84969142 * rad,
           -73.5031685 * rad,
           49.55953891 * rad,
-          19.39019754 * rad,
-          3389.9
+          19.39019754 * rad
         )
 
         array.push(
+          69911,
           51544.5,
           5.20288700,
           0.04838624,
           1.30439695 * rad,
           -85.74542926 * rad,
           100.47390909 * rad,
-          19.66796068 * rad,
-          69911
+          19.66796068 * rad
         )
 
         array.push(
+          58232,
           51544.5,
           9.53667594,
           0.05386179,
           2.48599187 * rad,
           -21.06354617 * rad,
           113.66242448 * rad,
-          -42.64463408 * rad,
-          58232
+          -42.64463408 * rad
         )
 
         array.push(
+          25362,
           51544.5,
           19.18916464,
           0.04725744,
           0.77263783 * rad,
           96.93735127 * rad,
           74.01692503 * rad,
-          142.28382821 * rad,
-          25362
+          142.28382821 * rad
         )
 
         array.push(
+          24622,
           51544.5,
           30.06992276,
           0.00859048,
           1.77004347 * rad,
           -86.81946347 * rad,
           131.78422574 * rad,
-          -100.08479196 * rad,
-          24622
+          -100.08479196 * rad
         )
 
         if(regex.exec(data) && regex.exec(data))
           while(match = regex.exec(data)) {
             h = parseFloat(match[9])
 
-            if(h <= 10)
+            if(h <= 12)
               array.push(
+                /* Assumes an average albedo of 0.1. */
+                2100 * Math.pow(10, -0.2 * h),
                 parseFloat(match[2]),
                 parseFloat(match[3]),
                 parseFloat(match[4]),
                 parseFloat(match[5]) * rad,
                 parseFloat(match[6]) * rad,
                 parseFloat(match[7]) * rad,
-                parseFloat(match[8]) * rad,
-                1716 * Math.pow(10, -0.2 * h)
+                parseFloat(match[8]) * rad
               )
           }
 
         return array
       }
 
-      function drawKepler(ctx, t, arr, offset) {
-        var o  = arr[offset++],
-            a  = arr[offset++],
-            e  = arr[offset++],
-            i  = arr[offset++],
-            ci = Math.cos(i),
-            w  = arr[offset++],
+      function drawBody(ctx, x, y, r) {
+        ctx.beginPath()
+        ctx.arc(x, -y, Math.log(r) * 0.01, 0, TWO_PI, true)
+        ctx.fill()
+      }
+
+      function drawKeplerBody(ctx, t, r, o, a, e, i, w, l, m) {
+        var ci = Math.cos(i),
             sw = Math.sin(w),
             cw = Math.cos(w),
-            l  = arr[offset++],
             sl = Math.sin(l),
-            cl = Math.cos(l),
-            m  = arr[offset++],
-            r  = arr[offset++]
+            cl = Math.cos(l)
 
         t -= o
         m += t * SQRT_GM / Math.sqrt(a * a * a)
@@ -170,17 +169,15 @@
             x = (cw * cl - sw * sl * ci) * u - (sw * cl + cw * sl * ci) * v,
             y = (cw * sl + sw * cl * ci) * u - (sw * sl - cw * cl * ci) * v
 
-        ctx.beginPath()
-        ctx.arc(x, -y, Math.log(r) * 0.01, 0, TWO_PI, true)
-        ctx.fill()
+        drawBody(ctx, x, y, r)
       }
 
-      function drawKeplerArray(ctx, t, arr) {
+      function drawKeplerBodyArray(ctx, t, arr) {
         var i = arr.length
 
         while(i) {
           i -= 8
-          drawKepler(ctx, t, arr, i)
+          drawKeplerBody(ctx, t, arr[i + 0], arr[i + 1], arr[i + 2], arr[i + 3], arr[i + 4], arr[i + 5], arr[i + 6], arr[i + 7])
         }
       }
 
@@ -201,11 +198,8 @@
           ctx.save()
           ctx.translate(ctx.canvas.width * 0.5, ctx.canvas.height * 0.5)
           ctx.scale(32, 32)
-          /* FIXME: drawing the sun here is a hack */
-          ctx.beginPath()
-          ctx.arc(0, 0, Math.log(696342) * 0.01, 0, TWO_PI, true)
-          ctx.fill()
-          drawKeplerArray(ctx, t, data)
+          drawBody(ctx, 0, 0, 696342)
+          drawKeplerBodyArray(ctx, t, data)
           ctx.restore()
         }, 0)
       })
