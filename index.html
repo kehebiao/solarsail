@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <title>Solar System Model</title>
     <meta charset="us-ascii">
   </head>
 
@@ -68,6 +69,7 @@
         var meanAnomaly = this.meanAnomaly + this.meanMotion * t,
             eccAnomaly  = meanAnomaly
 
+        eccAnomaly = meanAnomaly + this.eccentricity * Math.sin(eccAnomaly)
         eccAnomaly = meanAnomaly + this.eccentricity * Math.sin(eccAnomaly)
         eccAnomaly = meanAnomaly + this.eccentricity * Math.sin(eccAnomaly)
 
@@ -642,7 +644,7 @@
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
         ctx.save()
         ctx.translate(ctx.canvas.width * 0.5, ctx.canvas.height * 0.5)
-        ctx.scale(12, 12)
+        ctx.scale(24, 24)
         sol.draw(ctx, day * 365.25)
         ctx.restore()
       }, 1000 / 60)
