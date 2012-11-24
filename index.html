@@ -52,6 +52,7 @@
         period
       ) {
         Body.call(this, name, radius)
+        this.epoch        = 51544
         this.semimajor    = semimajor
         this.eccentricity = eccentricity
         this.inclination  = inclination * RADIANS
@@ -63,7 +64,7 @@
       KeplerBody.prototype.__proto__ = Body.prototype
 
       KeplerBody.prototype.draw = function(ctx, t) {
-        var meanAnomaly = this.meanAnomaly + t * SQRT_GM / Math.sqrt(this.semimajor * this.semimajor * this.semimajor),
+        var meanAnomaly = this.meanAnomaly + (t - this.epoch) * SQRT_GM / Math.sqrt(this.semimajor * this.semimajor * this.semimajor),
             eccAnomaly  = meanAnomaly
 
         eccAnomaly = meanAnomaly + this.eccentricity * Math.sin(eccAnomaly)
@@ -638,7 +639,7 @@
 
       start = Date.now()
       setInterval(function() {
-        var day = (Date.now() - start) * 0.001
+        var day = 51544 + (Date.now() - start) * 0.001
 
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
         ctx.save()
