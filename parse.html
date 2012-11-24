@@ -34,82 +34,60 @@
         var rad   = Math.PI / 180,
             regex = /^.{6} (.{17}) (.{5}) (.{10}) (.{10}) (.{9}) (.{9}) (.{9}) (.{11}) (.{5})/gm,
             array = [],
-            match
+            match, h
 
         if(regex.exec(data) && regex.exec(data))
           while(match = regex.exec(data)) {
-            array.push(
-              parseFloat(match[2]),
-              parseFloat(match[3]),
-              parseFloat(match[4]),
-              Math.cos(parseFloat(match[5]) * rad),
-              parseFloat(match[6]) * rad,
-              parseFloat(match[7]) * rad,
-              parseFloat(match[8]) * rad,
-              0.03125 /* FIXME */
-            )
+            h = parseFloat(match[9])
 
-            /* FIXME */
-            if(array.length === 8000)
-              break
+            if(h <= 11)
+              array.push(
+                parseFloat(match[2]),
+                parseFloat(match[3]),
+                parseFloat(match[4]),
+                parseFloat(match[5]) * rad,
+                parseFloat(match[6]) * rad,
+                parseFloat(match[7]) * rad,
+                parseFloat(match[8]) * rad,
+                h
+              )
           }
 
         return array
       }
 
       function drawKepler(ctx, t, arr, offset) {
-        var o = arr[offset++],
-            a = arr[offset++],
-            e = arr[offset++],
-            p = arr[offset++],
-            w = arr[offset++],
-            l = arr[offset++],
-            m = arr[offset++],
-            r = arr[offset++]
+        /* FIXME: I think there's much simpler math available for computing a
+         * given position than the transformation hell below. */
+
+        var o  = arr[offset++],
+            a  = arr[offset++],
+            e  = arr[offset++],
+            i  = arr[offset++],
+            ci = Math.cos(i),
+            w  = arr[offset++],
+            sw = Math.sin(w),
+            cw = Math.cos(w),
+            l  = arr[offset++],
+            sl = Math.sin(l),
+            cl = Math.cos(l),
+            m  = arr[offset++],
+            h  = arr[offset++]
 
         t -= o
         m += t * SQRT_GM / Math.sqrt(a * a * a)
         o  = m
         o  = m + e * Math.sin(o)
         o  = m + e * Math.sin(o)
-        o *= 0.5
-        o  = Math.PI - 2 * Math.atan2(
-          Math.sqrt(1 - e) * Math.cos(o),
-          Math.sqrt(1 + e) * Math.sin(o)
-        )
-        t  = Math.sqrt(1 - e * e)
 
-        ctx.save()
+        var u = a * (Math.cos(o) - e),
+            v = a * Math.sqrt(1 - e * e) * Math.sin(o),
+            x = (cw * cl - sw * sl * ci) * u - (sw * cl + cw * sl * ci) * v,
+            y = (cw * sl + sw * cl * ci) * u - (sw * sl - cw * cl * ci) * v
 
-        ctx.rotate(-l)
-        ctx.scale(1, p)
-        ctx.rotate(-w)
-        ctx.translate(-(a * e), 0)
-        ctx.scale(1, t)
-
-        /*
         ctx.beginPath()
-        ctx.arc(0, 0, a, 0, TWO_PI, true)
-        ctx.stroke()
-        */
-
-        ctx.rotate(-o)
-        ctx.translate(a, 0)
-        ctx.rotate(o)
-        ctx.scale(1, 1 / t)
-        ctx.rotate(w)
-        ctx.scale(1, 1 / p)
-        ctx.rotate(l)
-
-        /*
-        ctx.beginPath()
-        ctx.arc(0, 0, r, 0, TWO_PI, true)
+        ctx.arc(x, -y, 0.03125 + Math.log(1 + (11 - h)) * 0.015625, 0, TWO_PI, true)
         ctx.fill()
-        */
-
-        ctx.fillRect(-r, -r, r + r, r + r)
-
-        ctx.restore()
       }
 
       function drawKeplerArray(ctx, t, arr) {
@@ -137,7 +115,8 @@
           ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
           ctx.save()
           ctx.translate(ctx.canvas.width * 0.5, ctx.canvas.height * 0.5)
-          ctx.scale(64, 64)
+          ctx.scale(32, 32)
+          ctx.lineWidth = 1 / 32
           drawKeplerArray(ctx, t, data)
           ctx.restore()
         }, 0)
