@@ -17,9 +17,9 @@
         this.radius = Math.log(radius) * 0.01
       }
 
-      Body.prototype.draw = function(ctx, x, y) {
+      Body.prototype.draw = function(ctx, x, y, zoom) {
         ctx.beginPath()
-        ctx.arc(x, y, this.radius, 0, 2 * Math.PI, true)
+        ctx.arc(x, y, this.radius * zoom, 0, 2 * Math.PI, true)
         ctx.fill()
       }
 
@@ -49,7 +49,7 @@
 
       KeplerBody.prototype.__proto__ = Body.prototype
 
-      KeplerBody.prototype.draw = function(ctx, x, y, t) {
+      KeplerBody.prototype.draw = function(ctx, x, y, zoom, t) {
         var m  = this.anomaly + (t - this.epoch) * this.motion
 
         t = m
@@ -57,15 +57,15 @@
         t = m + this.eccentricity * Math.sin(t)
         t = m + this.eccentricity * Math.sin(t)
 
-        var u = this.major * (Math.cos(t) - this.eccentricity),
-            v = this.minor * Math.sin(t)
+        var u = zoom * this.major * (Math.cos(t) - this.eccentricity),
+            v = zoom * this.minor * Math.sin(t)
 
         Body.prototype.draw.call(
           this,
           ctx,
           x + this.a * u - this.c * v,
           y - this.b * u + this.d * v,
-          this.radius
+          zoom
         )
       }
 
@@ -136,19 +136,15 @@
             start  = Date.now()
 
         setInterval(function() {
-          /* FIXME: translation has been moved into the drawing function. Move
-           * scaling in, too. */
-          var x = ctx.canvas.width * 0.5 / 32,
-              y = ctx.canvas.height * 0.5 / 32,
+          var x = ctx.canvas.width * 0.5,
+              y = ctx.canvas.height * 0.5,
+              s = 32,
               t = 51544 + (Date.now() - start) * 0.001 * 365.25 / 12,
               i = data.length
 
           ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-          ctx.save()
-          ctx.scale(32, 32)
           while(i--)
-            data[i].draw(ctx, x, y, t)
-          ctx.restore()
+            data[i].draw(ctx, x, y, 32, t)
         }, 0)
       })
     </script>
