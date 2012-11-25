@@ -93,34 +93,28 @@
             array = [],
             match
 
-          while(match = regex.exec(data))
-            /* FIXME: This check is brittle. We should try parseFloat on each
-             * argument. If we have all of them, build a KeplerBody. If we have
-             * the name and the radius, build a Body. Otherwise, skip! */
-            if(match[3] === undefined ||
-               match[4] === undefined ||
-               match[5] === undefined ||
-               match[6] === undefined ||
-               match[7] === undefined ||
-               match[8] === undefined ||
-               match[9] === undefined)
-              array.push(new Body(
-                match[1],
-                parseFloat(match[2])
-              ))
+          while(match = regex.exec(data)) {
+            match[2] = parseFloat(match[2])
+            match[3] = parseFloat(match[3])
+            match[4] = parseFloat(match[4])
+            match[5] = parseFloat(match[5])
+            match[6] = parseFloat(match[6]) * rad
+            match[7] = parseFloat(match[7]) * rad
+            match[8] = parseFloat(match[8]) * rad
+            match[9] = parseFloat(match[9]) * rad
 
-            else
-              array.push(new KeplerBody(
-                match[1],
-                parseFloat(match[2]),
-                parseFloat(match[3]),
-                parseFloat(match[4]),
-                parseFloat(match[5]),
-                parseFloat(match[6]) * rad,
-                parseFloat(match[7]) * rad,
-                parseFloat(match[8]) * rad,
-                parseFloat(match[9]) * rad
-              ))
+            if(!isNaN(match[2]))
+              array.push(
+                !isNaN(match[3]) && !isNaN(match[4]) && !isNaN(match[5]) &&
+                !isNaN(match[6]) && !isNaN(match[7]) && !isNaN(match[8]) &&
+                !isNaN(match[9]) ?
+                  new KeplerBody(
+                    match[1], match[2], match[3], match[4], match[5], match[6],
+                    match[7], match[8], match[9]
+                  ) :
+                  new Body(match[1], match[2])
+              )
+          }
 
         return array
       }
