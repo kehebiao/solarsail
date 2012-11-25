@@ -9,8 +9,6 @@
     </canvas>
 
     <script type="text/javascript">
-      var SQRT_GM = 0.017202098948448492
-
       function Body(name, radius) {
         this.name   = name
         this.radius = radius
@@ -23,38 +21,44 @@
       }
 
       function KeplerBody(name, radius, epoch, axis, eccentricity, inclination, argument, longitude, anomaly) {
+        var ci = Math.cos(inclination),
+            sw = Math.sin(argument),
+            cw = Math.cos(argument),
+            sl = Math.sin(longitude),
+            cl = Math.cos(longitude)
+
         Body.call(this, name, radius)
 
         this.epoch        = epoch
-        this.axis         = axis
+        this.major        = axis
+        this.minor        = axis * Math.sqrt(1 - eccentricity * eccentricity)
         this.eccentricity = eccentricity
         this.inclination  = inclination
         this.argument     = argument
         this.longitude    = longitude
         this.anomaly      = anomaly
+        this.motion       = Math.pow(axis, -1.5) * 0.017202098948448492
+        this.a            = cw * cl - sw * sl * ci
+        this.b            = cw * sl + sw * cl * ci
+        this.c            = sw * cl + cw * sl * ci
+        this.d            = sw * sl - cw * cl * ci
       }
 
       KeplerBody.prototype.__proto__ = Body.prototype
 
       KeplerBody.prototype.draw = function(ctx, t) {
-        var m  = this.anomaly + (t - this.epoch) * SQRT_GM / Math.sqrt(this.axis * this.axis * this.axis),
-            ci = Math.cos(this.inclination),
-            sw = Math.sin(this.argument),
-            cw = Math.cos(this.argument),
-            sl = Math.sin(this.longitude),
-            cl = Math.cos(this.longitude)
+        var m  = this.anomaly + (t - this.epoch) * this.motion
 
         t = m
         t = m + this.eccentricity * Math.sin(t)
         t = m + this.eccentricity * Math.sin(t)
+        t = m + this.eccentricity * Math.sin(t)
 
-        var u = this.axis * (Math.cos(t) - this.eccentricity),
-            v = this.axis * Math.sqrt(1 - this.eccentricity * this.eccentricity) * Math.sin(t),
-            x = (cw * cl - sw * sl * ci) * u - (sw * cl + cw * sl * ci) * v,
-            y = (cw * sl + sw * cl * ci) * u - (sw * sl - cw * cl * ci) * v
+        var u = this.major * (Math.cos(t) - this.eccentricity),
+            v = this.minor * Math.sin(t)
 
         ctx.save()
-        ctx.translate(x, -y)
+        ctx.translate(this.a * u - this.c * v, this.d * v - this.b * u)
         Body.prototype.draw.call(this, ctx)
         ctx.restore()
       }
