@@ -147,14 +147,14 @@
         loop(function(sec) {
           var x = ctx.canvas.width * 0.5,
               y = ctx.canvas.height * 0.5,
-              s = 32,
+              z = 32,
               t = 51544 + sec * 365.25 / 12,
               i = data.length
 
           ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
 
           while(i--)
-            data[i].draw(ctx, x, y, 32, t)
+            data[i].draw(ctx, x, y, z, t)
         }, canvas)
       })
     </script>
