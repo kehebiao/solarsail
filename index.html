@@ -105,14 +105,12 @@
 
             if(!isNaN(match[2]))
               array.push(
-                !isNaN(match[3]) && !isNaN(match[4]) && !isNaN(match[5]) &&
-                !isNaN(match[6]) && !isNaN(match[7]) && !isNaN(match[8]) &&
-                !isNaN(match[9]) ?
-                  new KeplerBody(
-                    match[1], match[2], match[3], match[4], match[5], match[6],
-                    match[7], match[8], match[9]
-                  ) :
-                  new Body(match[1], match[2])
+                new (isNaN(match[3]) || isNaN(match[4]) || isNaN(match[5]) ||
+                     isNaN(match[6]) || isNaN(match[7]) || isNaN(match[8]) ||
+                     isNaN(match[9]) ? Body : KeplerBody)(
+                  match[1], match[2], match[3], match[4], match[5], match[6],
+                  match[7], match[8], match[9]
+                )
               )
           }
 
