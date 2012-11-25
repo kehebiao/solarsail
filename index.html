@@ -125,6 +125,24 @@
         return array
       }
 
+      function loop(callback, el) {
+        var next = window.requestAnimationFrame       || 
+                   window.webkitRequestAnimationFrame || 
+                   window.mozRequestAnimationFrame    || 
+                   window.oRequestAnimationFrame      || 
+                   window.msRequestAnimationFrame     || 
+                   function(callback) {
+                     window.setTimeout(callback, 1000 / 60)
+                   },
+            loop = function() {
+              next(loop, el)
+              callback((Date.now() - start) * 0.001)
+            },
+            start = Date.now()
+
+        loop()
+      }
+
       request("elements.csv", function(err, data) {
         if(err)
           throw err
@@ -132,20 +150,20 @@
         data = parse(data)
 
         var canvas = document.getElementById("canvas"),
-            ctx    = canvas.getContext("2d"),
-            start  = Date.now()
+            ctx    = canvas.getContext("2d")
 
-        setInterval(function() {
+        loop(function(sec) {
           var x = ctx.canvas.width * 0.5,
               y = ctx.canvas.height * 0.5,
               s = 32,
-              t = 51544 + (Date.now() - start) * 0.001 * 365.25 / 12,
+              t = 51544 + sec * 365.25 / 12,
               i = data.length
 
           ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+
           while(i--)
             data[i].draw(ctx, x, y, 32, t)
-        }, 0)
+        }, canvas)
       })
     </script>
   </body>
