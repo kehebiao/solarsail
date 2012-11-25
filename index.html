@@ -12,19 +12,15 @@
     <script type="text/javascript">
       "use strict"
 
-      function circle(ctx, x, y, radius) {
-        ctx.beginPath()
-        ctx.arc(x, y, radius, 0, 2 * Math.PI, true)
-        ctx.fill()
-      }
-
       function Body(name, radius) {
         this.name   = name
         this.radius = Math.log(radius) * 0.01
       }
 
-      Body.prototype.draw = function(ctx, t) {
-        circle(ctx, 0, 0, this.radius)
+      Body.prototype.draw = function(ctx, x, y) {
+        ctx.beginPath()
+        ctx.arc(x, y, this.radius, 0, 2 * Math.PI, true)
+        ctx.fill()
       }
 
       function KeplerBody(name, radius, epoch, axis, eccentricity, inclination, argument, longitude, anomaly) {
@@ -53,7 +49,7 @@
 
       KeplerBody.prototype.__proto__ = Body.prototype
 
-      KeplerBody.prototype.draw = function(ctx, t) {
+      KeplerBody.prototype.draw = function(ctx, x, y, t) {
         var m  = this.anomaly + (t - this.epoch) * this.motion
 
         t = m
@@ -64,10 +60,11 @@
         var u = this.major * (Math.cos(t) - this.eccentricity),
             v = this.minor * Math.sin(t)
 
-        circle(
+        Body.prototype.draw.call(
+          this,
           ctx,
-          this.a * u - this.c * v,
-          this.d * v - this.b * u,
+          x + this.a * u - this.c * v,
+          y - this.b * u + this.d * v,
           this.radius
         )
       }
@@ -97,6 +94,9 @@
             match
 
           while(match = regex.exec(data))
+            /* FIXME: This check is brittle. We should try parseFloat on each
+             * argument. If we have all of them, build a KeplerBody. If we have
+             * the name and the radius, build a Body. Otherwise, skip! */
             if(match[3] === undefined ||
                match[4] === undefined ||
                match[5] === undefined ||
@@ -136,15 +136,18 @@
             start  = Date.now()
 
         setInterval(function() {
-          var t = 51544 + (Date.now() - start) * 0.001 * 365.25 / 12,
+          /* FIXME: translation has been moved into the drawing function. Move
+           * scaling in, too. */
+          var x = ctx.canvas.width * 0.5 / 32,
+              y = ctx.canvas.height * 0.5 / 32,
+              t = 51544 + (Date.now() - start) * 0.001 * 365.25 / 12,
               i = data.length
 
           ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
           ctx.save()
-          ctx.translate(ctx.canvas.width * 0.5, ctx.canvas.height * 0.5)
           ctx.scale(32, 32)
           while(i--)
-            data[i].draw(ctx, t)
+            data[i].draw(ctx, x, y, t)
           ctx.restore()
         }, 0)
       })
