@@ -9,8 +9,55 @@
     </canvas>
 
     <script type="text/javascript">
-      var TWO_PI  = 2 * Math.PI,
-          SQRT_GM = 0.017202098948448492
+      var SQRT_GM = 0.017202098948448492
+
+      function Body(name, radius) {
+        this.name   = name
+        this.radius = radius
+      }
+
+      Body.prototype.draw = function(ctx) {
+        ctx.beginPath()
+        ctx.arc(0, 0, Math.log(this.radius) * 0.01, 0, 2 * Math.PI, true)
+        ctx.fill()
+      }
+
+      function KeplerBody(name, radius, epoch, axis, eccentricity, inclination, argument, longitude, anomaly) {
+        Body.call(this, name, radius)
+
+        this.epoch        = epoch
+        this.axis         = axis
+        this.eccentricity = eccentricity
+        this.inclination  = inclination
+        this.argument     = argument
+        this.longitude    = longitude
+        this.anomaly      = anomaly
+      }
+
+      KeplerBody.prototype.__proto__ = Body.prototype
+
+      KeplerBody.prototype.draw = function(ctx, t) {
+        var m  = this.anomaly + (t - this.epoch) * SQRT_GM / Math.sqrt(this.axis * this.axis * this.axis),
+            ci = Math.cos(this.inclination),
+            sw = Math.sin(this.argument),
+            cw = Math.cos(this.argument),
+            sl = Math.sin(this.longitude),
+            cl = Math.cos(this.longitude)
+
+        t = m
+        t = m + this.eccentricity * Math.sin(t)
+        t = m + this.eccentricity * Math.sin(t)
+
+        var u = this.axis * (Math.cos(t) - this.eccentricity),
+            v = this.axis * Math.sqrt(1 - this.eccentricity * this.eccentricity) * Math.sin(t),
+            x = (cw * cl - sw * sl * ci) * u - (sw * cl + cw * sl * ci) * v,
+            y = (cw * sl + sw * cl * ci) * u - (sw * sl - cw * cl * ci) * v
+
+        ctx.save()
+        ctx.translate(x, -y)
+        Body.prototype.draw.call(this, ctx)
+        ctx.restore()
+      }
 
       function request(url, callback) {
         var req = new XMLHttpRequest()
@@ -32,59 +79,31 @@
 
       function parse(data) {
         var rad   = Math.PI / 180,
-            regex = /^[^,]*,([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),([^,]*)$/gm,
+            regex = /^([^,]*),([^,]*)(?:,([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),([^,]*))?$/gm,
             array = [],
             match
 
           while(match = regex.exec(data))
-            array.push(
-              parseFloat(match[1]),
-              parseFloat(match[2]),
-              parseFloat(match[3]),
-              parseFloat(match[4]),
-              parseFloat(match[5]) * rad,
-              parseFloat(match[6]) * rad,
-              parseFloat(match[7]) * rad,
-              parseFloat(match[8]) * rad
-            )
+            if(match.length === 3)
+              array.push(new Body(
+                match[1],
+                parseFloat(match[2])
+              ))
+
+            else if(match.length === 10)
+              array.push(new KeplerBody(
+                match[1],
+                parseFloat(match[2]),
+                parseFloat(match[3]),
+                parseFloat(match[4]),
+                parseFloat(match[5]),
+                parseFloat(match[6]) * rad,
+                parseFloat(match[7]) * rad,
+                parseFloat(match[8]) * rad,
+                parseFloat(match[9]) * rad
+              ))
 
         return array
-      }
-
-      function drawBody(ctx, x, y, r) {
-        ctx.beginPath()
-        ctx.arc(x, -y, Math.log(r) * 0.01, 0, TWO_PI, true)
-        ctx.fill()
-      }
-
-      function drawKeplerBody(ctx, t, r, o, a, e, i, w, l, m) {
-        var ci = Math.cos(i),
-            sw = Math.sin(w),
-            cw = Math.cos(w),
-            sl = Math.sin(l),
-            cl = Math.cos(l)
-
-        t -= o
-        m += t * SQRT_GM / Math.sqrt(a * a * a)
-        o  = m
-        o  = m + e * Math.sin(o)
-        o  = m + e * Math.sin(o)
-
-        var u = a * (Math.cos(o) - e),
-            v = a * Math.sqrt(1 - e * e) * Math.sin(o),
-            x = (cw * cl - sw * sl * ci) * u - (sw * cl + cw * sl * ci) * v,
-            y = (cw * sl + sw * cl * ci) * u - (sw * sl - cw * cl * ci) * v
-
-        drawBody(ctx, x, y, r)
-      }
-
-      function drawKeplerBodyArray(ctx, t, arr) {
-        var i = arr.length
-
-        while(i) {
-          i -= 8
-          drawKeplerBody(ctx, t, arr[i + 0], arr[i + 1], arr[i + 2], arr[i + 3], arr[i + 4], arr[i + 5], arr[i + 6], arr[i + 7])
-        }
       }
 
       request("elements.csv", function(err, data) {
@@ -98,14 +117,15 @@
             start  = Date.now()
 
         setInterval(function() {
-          var t = 51544 + (Date.now() - start) * 0.001 * 365.25 / 12
+          var t = 51544 + (Date.now() - start) * 0.001 * 365.25 / 12,
+              i = data.length
 
           ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
           ctx.save()
           ctx.translate(ctx.canvas.width * 0.5, ctx.canvas.height * 0.5)
           ctx.scale(32, 32)
-          drawBody(ctx, 0, 0, 696342)
-          drawKeplerBodyArray(ctx, t, data)
+          while(i--)
+            data[i].draw(ctx, t)
           ctx.restore()
         }, 0)
       })
