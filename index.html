@@ -9,15 +9,19 @@
     </canvas>
 
     <script type="text/javascript">
-      function Body(name, radius) {
-        this.name   = name
-        this.radius = radius
+      function circle(ctx, x, y, radius) {
+        ctx.beginPath()
+        ctx.arc(x, y, radius, 0, 2 * Math.PI, true)
+        ctx.fill()
       }
 
-      Body.prototype.draw = function(ctx) {
-        ctx.beginPath()
-        ctx.arc(0, 0, Math.log(this.radius) * 0.01, 0, 2 * Math.PI, true)
-        ctx.fill()
+      function Body(name, radius) {
+        this.name   = name
+        this.radius = Math.log(radius) * 0.01
+      }
+
+      Body.prototype.draw = function(ctx, t) {
+        circle(ctx, 0, 0, this.radius)
       }
 
       function KeplerBody(name, radius, epoch, axis, eccentricity, inclination, argument, longitude, anomaly) {
@@ -57,10 +61,12 @@
         var u = this.major * (Math.cos(t) - this.eccentricity),
             v = this.minor * Math.sin(t)
 
-        ctx.save()
-        ctx.translate(this.a * u - this.c * v, this.d * v - this.b * u)
-        Body.prototype.draw.call(this, ctx)
-        ctx.restore()
+        circle(
+          ctx,
+          this.a * u - this.c * v,
+          this.d * v - this.b * u,
+          this.radius
+        )
       }
 
       function request(url, callback) {
@@ -88,13 +94,19 @@
             match
 
           while(match = regex.exec(data))
-            if(match.length === 3)
+            if(match[3] === undefined ||
+               match[4] === undefined ||
+               match[5] === undefined ||
+               match[6] === undefined ||
+               match[7] === undefined ||
+               match[8] === undefined ||
+               match[9] === undefined)
               array.push(new Body(
                 match[1],
                 parseFloat(match[2])
               ))
 
-            else if(match.length === 10)
+            else
               array.push(new KeplerBody(
                 match[1],
                 parseFloat(match[2]),
