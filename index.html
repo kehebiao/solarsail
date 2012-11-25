@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <title>Solar System Simulation</title>
     <meta charset="us-ascii">
   </head>
 
@@ -9,6 +10,8 @@
     </canvas>
 
     <script type="text/javascript">
+      "use strict"
+
       function circle(ctx, x, y, radius) {
         ctx.beginPath()
         ctx.arc(x, y, radius, 0, 2 * Math.PI, true)
